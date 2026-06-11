@@ -206,7 +206,6 @@ const $ = (id) => document.getElementById(id);
 
 document.addEventListener("DOMContentLoaded", () => {
   buildTower("homeTower", 1, { decorative: true });
-  buildTower("miniTower", 1);
   bindEvents();
   validateQuestionBank();
   updateTopbar();
@@ -252,6 +251,8 @@ function showScreen(id) {
 
 function setBodyScreenClass(id) {
   document.body.classList.toggle("home-active", id === "homeScreen");
+  document.body.classList.remove(...Array.from(document.body.classList).filter((className) => className.startsWith("screen-")));
+  document.body.classList.add(`screen-${id}`);
 }
 
 function startRun() {
@@ -331,26 +332,56 @@ function stopTimer() {
 
 function updateTimerLabels() {
   const formatted = formatTime(state.elapsedSeconds);
-  const timerLabel = $("timerLabel");
-  if (timerLabel) timerLabel.textContent = formatted;
-  $("topTimer").textContent = formatted;
+  const topTimer = $("topTimer");
+  if (topTimer) topTimer.textContent = `Time: ${formatted}`;
 }
 
 function updateTopbar() {
-  $("topFloor").textContent = `Floor ${state.currentFloor}`;
-  $("topScore").textContent = `${getTotalScore()}/${TOTAL_TOWER_SCORE}`;
-  $("topTimer").textContent = formatTime(state.elapsedSeconds);
+  const topFloor = $("topFloor");
+  const topScore = $("topScore");
+  const topTimer = $("topTimer");
+  if (topFloor) topFloor.textContent = `Floor ${state.currentFloor}`;
+  if (topScore) topScore.textContent = `${getTotalScore()}/${TOTAL_TOWER_SCORE}`;
+  if (topTimer) topTimer.textContent = `Time: ${formatTime(state.elapsedSeconds)}`;
 }
 
 function updateGameDisplay() {
   const score = getTotalScore();
-  $("positionLabel").textContent = `Floor ${state.currentFloor} — Sublevel ${state.currentSublevel}`;
-  $("scoreLabel").textContent = `${score}/${TOTAL_TOWER_SCORE}`;
-  $("scoreBar").style.width = `${Math.min(100, (score / TOTAL_TOWER_SCORE) * 100)}%`;
-  $("difficultyLabel").textContent = getRequiredDifficulty(state.currentFloor);
-  $("topFloor").textContent = `Floor ${state.currentFloor}`;
-  $("topScore").textContent = `${score}/${TOTAL_TOWER_SCORE}`;
-  buildTower("miniTower", state.currentFloor);
+  const currentSublevel = Math.max(0, Math.min(SUBLEVELS_PER_FLOOR, state.currentSublevel));
+
+  const positionLabel = $("positionLabel");
+  const sublevelProgressLabel = $("sublevelProgressLabel");
+
+  if (positionLabel) positionLabel.textContent = `${state.currentFloor}`;
+  const topFloor = $("topFloor");
+  const topScore = $("topScore");
+  if (topFloor) topFloor.textContent = `Floor ${state.currentFloor}`;
+  if (topScore) topScore.textContent = `${score}/${TOTAL_TOWER_SCORE}`;
+  if (sublevelProgressLabel) sublevelProgressLabel.textContent = `${currentSublevel}/${SUBLEVELS_PER_FLOOR}`;
+
+  renderSublevelDots(currentSublevel);
+}
+
+function getProgressMessage(sublevel) {
+  if (sublevel >= SUBLEVELS_PER_FLOOR) return "Floor cleared! Keep climbing!";
+  if (sublevel >= 10) return "Almost there!";
+  if (sublevel >= 6) return "Great climb!";
+  if (sublevel >= 3) return "Keep going!";
+  return "Keep climbing!";
+}
+
+function renderSublevelDots(filledCount) {
+  const container = $("sublevelDots");
+  if (!container) return;
+  container.innerHTML = "";
+
+  for (let i = 1; i <= SUBLEVELS_PER_FLOOR; i++) {
+    const dot = document.createElement("span");
+    dot.className = "sublevel-dot";
+    if (i <= filledCount) dot.classList.add("filled");
+    dot.setAttribute("aria-label", `Sublevel ${i}${i <= filledCount ? " completed" : " remaining"}`);
+    container.appendChild(dot);
+  }
 }
 
 function getTotalScore() {
@@ -570,8 +601,8 @@ function formatTosLabel(value) {
 
 function showQuestionBankError(floorKey) {
   $("floorTopic").textContent = `Missing ${floorKey}`;
-  $("difficultyChip").textContent = "Question Bank Error";
-  $("questionText").textContent = `No questions found for ${floorKey}. Please check data/questions.js and confirm that window.QUESTION_BANK.${floorKey} exists.`;
+  const questionText = $("questionText");
+  if (questionText) questionText.textContent = `No questions found for ${floorKey}. Please check data/questions.js and confirm that window.QUESTION_BANK.${floorKey} exists.`;
   $("choicesBox").innerHTML = "";
 }
 
@@ -594,12 +625,10 @@ function shuffleArray(items) {
 }
 
 function renderQuestion(question) {
-  const itemNumber = state.currentSublevel + 1;
-  const requiredDifficulty = question.requiredDifficulty || getRequiredDifficulty(state.currentFloor);
-  $("floorTopic").textContent = `Floor ${state.currentFloor} • Item ${itemNumber} of ${SUBLEVELS_PER_FLOOR}`;
-  $("topicLabel").textContent = question.topic || "Grade 10 Mathematics";
-  $("difficultyLabel").textContent = requiredDifficulty;
-  $("difficultyChip").textContent = requiredDifficulty;
+  const floorTopic = $("floorTopic");
+  if (floorTopic) floorTopic.textContent = "";
+  const topicLabel = $("topicLabel");
+  if (topicLabel) topicLabel.textContent = question.topic || "Grade 10 Mathematics";
   $("questionText").textContent = question.question;
 
   const choicesBox = $("choicesBox");
@@ -1159,11 +1188,13 @@ function buildTower(containerId, activeFloor, options = {}) {
     const div = document.createElement("div");
     div.className = "floor-block";
     if (floor === activeFloor) div.classList.add("active");
+    if (floor < activeFloor) div.classList.add("completed");
+    if (floor > activeFloor) div.classList.add("locked");
     if (options.decorative) {
       div.innerHTML = "<span class='window'></span><span class='window'></span><span class='window'></span>";
       div.setAttribute("aria-hidden", "true");
     } else {
-      div.textContent = `Floor ${floor}`;
+      div.innerHTML = `<span class="floor-label">Floor ${floor}</span>`;
     }
     container.appendChild(div);
   }
