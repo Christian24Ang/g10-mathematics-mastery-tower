@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grade 10 Mastery Tower</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Grade 10 Mathematics Game</p>
+        <h1>Grade 10 Mathematics Mastery Tower</h1>
+      </div>
+      <div class="topbar-stats">
+        <span id="topFloor">Floor 1</span>
+        <span id="topScore">0/120</span>
+        <span id="topTimer">00:00</span>
+      </div>
+    </header>
+
+    <main>
+      <section id="homeScreen" class="screen active">
+        <div class="hero-grid">
+          <div class="hero-card tower-entrance-card">
+            <p class="eyebrow">A Complete Grade 10 Mathematics Challenge</p>
+            <h2>Enter the Grade 10 Mathematics Mastery Tower ♛!</h2>
+            <p class="hero-text">Climb a complete Grade 10 Mathematics Tower covering Sequences, Polynomials, Polynomial Functions, Circles, Probability, Combinations, Measures of Position, Statistics, and Mini-Research.</p>
+
+            <div class="champion-grid" aria-label="Current champions">
+              <div class="champion-card tower-master-card">
+                <span class="champion-crown">♛</span>
+                <div>
+                  <p class="champion-title">Tower Master</p>
+                  <strong id="towerMasterName">No champion yet</strong>
+                  <span id="towerMasterMeta">All-Time Leaderboard Top 1</span>
+                </div>
+              </div>
+              <div class="champion-card little-master-card">
+                <span class="champion-crown">♜</span>
+                <div>
+                  <p class="champion-title">Little Tower Master</p>
+                  <strong id="littleTowerMasterName">No weekly champion yet</strong>
+                  <span id="littleTowerMasterMeta">Weekly Leaderboard Top 1</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button class="primary-btn" id="startBtn">Start Game</button>
+              <button class="secondary-btn" id="leaderboardBtn">Leaderboard</button>
+              <button class="secondary-btn" id="howBtn">How to Play</button>
+            </div>
+          </div>
+          <div class="tower-card leaderboard-explanation-card" aria-label="Leaderboard title explanation">
+            <section class="last-week-master-card" aria-label="Last week's Little Tower Master">
+              <p class="eyebrow">Previous Weekly Champion</p>
+              <strong id="lastWeekLittleMasterName">No previous weekly champion yet.</strong>
+              <span id="lastWeekLittleMasterMeta">Resets every Sunday at 8:00 PM Philippine Time</span>
+            </section>
+
+            <section class="monthly-master-card" aria-label="Monthly Tower Champion">
+              <p class="eyebrow">Previous Monthly Champion</p>
+              <strong id="monthlyTowerChampionName">No monthly champion yet.</strong>
+              <span id="monthlyTowerChampionMeta">Top 1 player from the previous completed month</span>
+            </section>
+
+            <div class="leaderboard-title-section">
+              <p class="eyebrow">Leaderboard Titles</p>
+              <h2>What do the titles mean?</h2>
+              <div class="title-explanation-list">
+                <article class="title-explanation-item">
+                  <span class="champion-crown">♛</span>
+                  <div>
+                    <h3>Tower Master</h3>
+                    <p>The Tower Master is the <strong>Overall Top 1 player</strong> in the All-Time Leaderboard.</p>
+                  </div>
+                </article>
+                <article class="title-explanation-item">
+                  <span class="champion-crown">♜</span>
+                  <div>
+                    <h3>Little Tower Master</h3>
+                    <p>The Little Tower Master is the <strong>Weekly Top 1 player</strong> in the Weekly Leaderboard.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <p class="developer-credit">Developed by Christian J. Angangan</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="entryScreen" class="screen">
+        <div class="panel narrow">
+          <p class="eyebrow">Player Entry</p>
+          <h2>Enter your details</h2>
+          <label>Student Name
+            <input id="playerName" type="text" placeholder="e.g., Juan Dela Cruz" autocomplete="name" />
+          </label>
+          <label>Section
+            <input id="playerSection" type="text" placeholder="e.g., 10-Einstein" />
+          </label>
+          <label>School
+            <input id="playerSchool" type="text" placeholder="e.g., SCNHS" autocomplete="organization" required />
+          </label>
+          <div class="button-row">
+            <button class="primary-btn" id="beginRunBtn">Begin Climb</button>
+            <button class="secondary-btn" data-go="homeScreen">Back</button>
+          </div>
+          <p id="entryMessage" class="message"></p>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="screen">
+        <div class="game-grid">
+          <aside class="progress-panel">
+            <p class="eyebrow">Current Run</p>
+            <h2 id="positionLabel">Floor 1 — Sublevel 0</h2>
+            <div class="meter">
+              <div id="scoreBar" class="meter-fill"></div>
+            </div>
+            <div class="stat-list">
+              <div><span>Score</span><strong id="scoreLabel">0/120</strong></div>
+              <div><span>Time</span><strong id="timerLabel">00:00</strong></div>
+              <div><span>Difficulty</span><strong id="difficultyLabel">Very Easy</strong></div>
+              <div><span>Topic</span><strong id="topicLabel">Grade 10 Mathematics</strong></div>
+            </div>
+            <div class="button-stack">
+              <button class="submit-btn" id="submitProgressBtn">Submit Progress</button>
+              <button class="danger-btn" id="quitBtn">Quit Run</button>
+            </div>
+            <p id="submitMessage" class="message"></p>
+            <div class="mini-tower" id="miniTower"></div>
+          </aside>
+
+          <section class="question-panel">
+            <div class="question-head">
+              <p id="floorTopic" class="eyebrow">Floor 1</p>
+              <span id="difficultyChip" class="chip">Very Easy</span>
+            </div>
+            <h2 id="questionText">Question will appear here.</h2>
+            <div id="choicesBox" class="choices"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="gameOverScreen" class="screen">
+        <div class="panel">
+          <p class="eyebrow danger">Game Over</p>
+          <h2>One mistake sends you back to the beginning on your next run.</h2>
+          <div class="result-grid">
+            <div><span>Floor Reached</span><strong id="overFloor">1</strong></div>
+            <div><span>Sublevel Reached</span><strong id="overSublevel">0</strong></div>
+            <div><span>Score</span><strong id="overScore">0/120</strong></div>
+            <div><span>Time Used</span><strong id="overTime">00:00</strong></div>
+          </div>
+          <div class="explanation-box">
+            <p><strong>Correct Answer:</strong> <span id="correctAnswerLabel"></span></p>
+            <p><strong>Explanation:</strong> <span id="explanationLabel"></span></p>
+          </div>
+          <div class="button-row">
+            <button class="submit-btn" id="submitGameOverBtn">Submit Progress</button>
+            <button class="primary-btn" id="restartBtn">Restart</button>
+            <button class="secondary-btn" data-go="homeScreen">Home</button>
+          </div>
+          <p id="gameOverSubmitMessage" class="message"></p>
+        </div>
+      </section>
+
+      <section id="quitScreen" class="screen">
+        <div class="panel">
+          <p class="eyebrow warning">Quit Result</p>
+          <h2>You ended the current run voluntarily.</h2>
+          <p class="muted">Quitting does not count as a wrong answer. Your reached floor, sublevel, score, and time are preserved for manual submission.</p>
+          <div class="result-grid">
+            <div><span>Floor Reached</span><strong id="quitFloor">1</strong></div>
+            <div><span>Sublevel Reached</span><strong id="quitSublevel">0</strong></div>
+            <div><span>Score</span><strong id="quitScore">0/120</strong></div>
+            <div><span>Time Used</span><strong id="quitTime">00:00</strong></div>
+          </div>
+          <div class="button-row">
+            <button class="submit-btn" id="submitQuitBtn">Submit Progress</button>
+            <button class="primary-btn" id="restartFromQuitBtn">Restart</button>
+            <button class="secondary-btn" data-go="homeScreen">Home</button>
+          </div>
+          <p id="quitSubmitMessage" class="message"></p>
+        </div>
+      </section>
+
+      <section id="completeScreen" class="screen">
+        <div class="panel celebration">
+          <p class="eyebrow success">Tower Completed</p>
+          <h2>Congratulations! You completed the Mastery Tower.</h2>
+          <p>You achieved a perfect 120-question streak.</p>
+          <div class="result-grid">
+            <div><span>Final Score</span><strong>120/120</strong></div>
+            <div><span>Total Time</span><strong id="completeTime">00:00</strong></div>
+          </div>
+          <div id="badgeBox" class="badges"></div>
+          <div class="button-row center">
+            <button class="submit-btn" id="submitCompleteBtn">Submit Progress</button>
+            <button class="secondary-btn" data-go="homeScreen">Home</button>
+          </div>
+          <p id="completeSubmitMessage" class="message"></p>
+        </div>
+      </section>
+
+      <section id="leaderboardScreen" class="screen">
+        <div class="panel wide">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Firebase Firestore</p>
+              <h2>Leaderboard</h2>
+            </div>
+            <button class="secondary-btn" data-go="homeScreen">Home</button>
+          </div>
+          <p class="muted">Ranking: Highest Floor → Highest Sublevel → Fastest Time. Each leaderboard shows only the Top 10. Weekly rankings reset every Sunday at 8:00 PM Philippine Time.</p>
+
+          <div class="leaderboard-grid">
+            <article class="leaderboard-card">
+              <div class="leaderboard-title-row">
+                <div>
+                  <p class="eyebrow">Current Week</p>
+                  <h3>Weekly Leaderboard</h3>
+                </div>
+                <span class="master-chip">Top 1: Little Tower Master</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Player</th>
+                      <th>Section</th>
+                      <th>School</th>
+                      <th>Floor</th>
+                      <th>Sublevel</th>
+                      <th>Score</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="weeklyLeaderboardBody"></tbody>
+                </table>
+              </div>
+              <p id="weeklyLeaderboardMessage" class="message"></p>
+            </article>
+
+            <article class="leaderboard-card">
+              <div class="leaderboard-title-row">
+                <div>
+                  <p class="eyebrow">Overall Records</p>
+                  <h3>All-Time Leaderboard</h3>
+                </div>
+                <span class="master-chip">Top 1: Tower Master</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Player</th>
+                      <th>Section</th>
+                      <th>School</th>
+                      <th>Floor</th>
+                      <th>Sublevel</th>
+                      <th>Score</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="allTimeLeaderboardBody"></tbody>
+                </table>
+              </div>
+              <p id="allTimeLeaderboardMessage" class="message"></p>
+            </article>
+          </div>
+          <p id="leaderboardMessage" class="message"></p>
+        </div>
+      </section>
+
+      <section id="howScreen" class="screen">
+        <div class="panel wide">
+          <p class="eyebrow">Rules</p>
+          <h2>How to Play</h2>
+          <div class="rules-grid">
+            <article>
+              <h3>Perfect Run</h3>
+              <p>Answer correctly to move up one sublevel. One wrong answer ends the run and resets the next attempt to Floor 1 — Sublevel 0.</p>
+            </article>
+            <article>
+              <h3>Difficulty Floors</h3>
+              <p>Each floor has one fixed difficulty level, starting from Very Easy and becoming harder until Mastery Level. Each 12-question floor attempt uses 12 different Grade 10 Mathematics topics: 3 Algebra, 3 Geometry, 3 Probability, and 3 Statistics.</p>
+            </article>
+            <article>
+              <h3>Quit Button</h3>
+              <p>Use Quit Run to voluntarily stop your attempt. It does not count as a wrong answer.</p>
+            </article>
+            <article>
+              <h3>Leaderboard</h3>
+              <p>Students are ranked by floor reached, sublevel reached, then fastest time.</p>
+            </article>
+          </div>
+          <button class="secondary-btn" data-go="homeScreen">Back to Home</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="data/questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
