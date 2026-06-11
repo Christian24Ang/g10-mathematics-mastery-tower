@@ -1,0 +1,167 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /leaderboard/{studentKey} {
+      allow read: if true;
+
+      allow create, update: if isValidEntry(studentKey);
+
+      allow delete: if false;
+    }
+
+    function isValidEntry(studentKey) {
+      return request.resource.data.keys().hasOnly([
+        "studentKey",
+        "name",
+        "section",
+        "school",
+
+        "towerId",
+        "towerName",
+        "maxFloors",
+        "totalPossibleScore",
+
+        "currentFloor",
+        "currentSublevel",
+        "totalScore",
+        "timeUsedSeconds",
+        "timeUsedFormatted",
+
+        "latestFloor",
+        "latestSublevel",
+        "latestScore",
+        "latestTimeSeconds",
+        "latestTimeFormatted",
+
+        "bestFloor",
+        "bestSublevel",
+        "bestScore",
+        "bestTimeSeconds",
+        "bestTimeFormatted",
+        "bestStatus",
+        "bestWeekId",
+        "bestMonthId",
+        "bestRunId",
+        "bestProgressKey",
+        "bestTowerId",
+        "bestTowerName",
+
+        "floor",
+        "sublevel",
+        "score",
+        "timeUsed",
+        "status",
+
+        "weekId",
+        "monthId",
+        "runId",
+        "progressKey",
+
+        "createdAt",
+        "submittedAt",
+        "updatedAt",
+        "timestamp",
+        "submissionCount"
+      ]) &&
+
+      request.resource.data.studentKey == studentKey &&
+
+      request.resource.data.studentKey is string &&
+      request.resource.data.name is string &&
+      request.resource.data.section is string &&
+      request.resource.data.school is string &&
+
+      request.resource.data.towerId is string &&
+      request.resource.data.towerName is string &&
+      request.resource.data.towerId in ["bigTower", "term1Tower", "term2Tower", "term3Tower"] &&
+
+      request.resource.data.maxFloors is int &&
+      request.resource.data.totalPossibleScore is int &&
+
+      (
+        (request.resource.data.towerId == "bigTower" &&
+         request.resource.data.maxFloors == 10 &&
+         request.resource.data.totalPossibleScore == 120)
+        ||
+        (request.resource.data.towerId in ["term1Tower", "term2Tower", "term3Tower"] &&
+         request.resource.data.maxFloors == 5 &&
+         request.resource.data.totalPossibleScore == 60)
+      ) &&
+
+      request.resource.data.currentFloor is int &&
+      request.resource.data.currentSublevel is int &&
+      request.resource.data.totalScore is int &&
+      request.resource.data.timeUsedSeconds is int &&
+      request.resource.data.timeUsedFormatted is string &&
+
+      request.resource.data.latestFloor is int &&
+      request.resource.data.latestSublevel is int &&
+      request.resource.data.latestScore is int &&
+      request.resource.data.latestTimeSeconds is int &&
+      request.resource.data.latestTimeFormatted is string &&
+
+      request.resource.data.bestFloor is int &&
+      request.resource.data.bestSublevel is int &&
+      request.resource.data.bestScore is int &&
+      request.resource.data.bestTimeSeconds is int &&
+      request.resource.data.bestTimeFormatted is string &&
+
+      request.resource.data.floor is int &&
+      request.resource.data.sublevel is int &&
+      request.resource.data.score is int &&
+      request.resource.data.timeUsed is int &&
+
+      request.resource.data.status is string &&
+      request.resource.data.weekId is string &&
+      request.resource.data.monthId is string &&
+      request.resource.data.runId is string &&
+      request.resource.data.progressKey is string &&
+      request.resource.data.submissionCount is int &&
+
+      request.resource.data.bestStatus is string &&
+      request.resource.data.bestWeekId is string &&
+      request.resource.data.bestMonthId is string &&
+      request.resource.data.bestRunId is string &&
+      request.resource.data.bestProgressKey is string &&
+      request.resource.data.bestTowerId is string &&
+      request.resource.data.bestTowerName is string &&
+
+      request.resource.data.currentFloor >= 1 &&
+      request.resource.data.currentFloor <= request.resource.data.maxFloors &&
+      request.resource.data.floor >= 1 &&
+      request.resource.data.floor <= request.resource.data.maxFloors &&
+      request.resource.data.bestFloor >= 1 &&
+      request.resource.data.bestFloor <= request.resource.data.maxFloors &&
+
+      request.resource.data.currentSublevel >= 0 &&
+      request.resource.data.currentSublevel <= 12 &&
+      request.resource.data.sublevel >= 0 &&
+      request.resource.data.sublevel <= 12 &&
+      request.resource.data.bestSublevel >= 0 &&
+      request.resource.data.bestSublevel <= 12 &&
+
+      request.resource.data.totalScore >= 0 &&
+      request.resource.data.totalScore <= request.resource.data.totalPossibleScore &&
+      request.resource.data.score >= 0 &&
+      request.resource.data.score <= request.resource.data.totalPossibleScore &&
+      request.resource.data.bestScore >= 0 &&
+      request.resource.data.bestScore <= request.resource.data.totalPossibleScore &&
+
+      request.resource.data.timeUsed >= 0 &&
+      request.resource.data.timeUsedSeconds >= 0 &&
+      request.resource.data.latestTimeSeconds >= 0 &&
+      request.resource.data.bestTimeSeconds >= 0 &&
+
+      request.resource.data.createdAt is timestamp &&
+      request.resource.data.submittedAt is timestamp &&
+      request.resource.data.updatedAt is timestamp &&
+      request.resource.data.timestamp is timestamp;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

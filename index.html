@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Grade 10 Mastery Tower</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 </head>
-<link rel="icon" type="image/png" href="favicon.png">
 <body>
   <div class="app-shell">
     <header class="topbar">
@@ -19,7 +19,7 @@
       <div class="topbar-stats">
         <span id="topTimer" class="time-chip">Time: 00:00</span>
         <span id="topFloor" class="hidden-run-stat">Floor 1</span>
-        <span id="topScore" class="hidden-run-stat">0/120</span>
+        <span id="topScore" class="hidden-run-stat">0/360</span>
       </div>
     </header>
 
@@ -27,68 +27,103 @@
       <section id="homeScreen" class="screen active">
         <div class="hero-grid">
           <div class="hero-card tower-entrance-card">
-            <p class="eyebrow">A Complete Grade 10 Mathematics Challenge</p>
-            <h2>Enter the Grade 10 Mathematics Mastery Tower ♛!</h2>
-            <p class="hero-text">Climb a complete Grade 10 Mathematics Tower covering Sequences, Polynomials, Polynomial Functions, Circles, Probability, Combinations, Measures of Position, Statistics, and Mini-Research.</p>
+            <p class="eyebrow">Four-Tower BOW Challenge</p>
+            <h2>Grade 10 Mathematics Mastery Tower</h2>
+            <p class="hero-text">Choose a tower, climb by answering Grade 10 Mathematics questions, and compete for the crown.</p>
 
-            <div class="champion-grid" aria-label="Current champions">
-              <div class="champion-card tower-master-card">
-                <span class="champion-crown">♛</span>
-                <div>
-                  <p class="champion-title">Tower Master</p>
-                  <strong id="towerMasterName">No champion yet</strong>
-                  <span id="towerMasterMeta">All-Time Leaderboard Top 1</span>
-                </div>
-              </div>
-              <div class="champion-card little-master-card">
-                <span class="champion-crown">♜</span>
-                <div>
-                  <p class="champion-title">Little Tower Master</p>
-                  <strong id="littleTowerMasterName">No weekly champion yet</strong>
-                  <span id="littleTowerMasterMeta">Weekly Leaderboard Top 1</span>
-                </div>
-              </div>
+            <div class="tower-choice-grid compact-tower-choice-grid" aria-label="Choose a tower">
+              <article class="tower-choice-card big-tower-choice">
+                <p class="eyebrow">GRAND MASTERY TOWER</p>
+                <p>Complete the full 30-week Grade 10 Mathematics BOW.</p>
+                <button class="primary-btn" data-start-tower="bigTower">Enter Grand Mastery Tower</button>
+              </article>
+
+              <article class="tower-choice-card">
+                <p class="eyebrow">FIRST TERM TRIAL TOWER</p>
+                <p>Focused 10-week challenge for First Term competencies.</p>
+                <button class="secondary-btn" data-start-tower="term1Tower">Enter First Term Tower</button>
+              </article>
+
+              <article class="tower-choice-card">
+                <p class="eyebrow">SECOND TERM TRIAL TOWER</p>
+                <p>Focused 10-week challenge for Second Term competencies.</p>
+                <button class="secondary-btn" data-start-tower="term2Tower">Enter Second Term Tower</button>
+              </article>
+
+              <article class="tower-choice-card">
+                <p class="eyebrow">THIRD TERM TRIAL TOWER</p>
+                <p>Focused 10-week challenge for Third Term competencies.</p>
+                <button class="secondary-btn" data-start-tower="term3Tower">Enter Third Term Tower</button>
+              </article>
             </div>
 
-            <div class="button-row">
+            <div class="button-row main-home-actions">
               <button class="primary-btn" id="startBtn">Start Game</button>
+              <button class="secondary-btn" id="practiceBtn">Practice Mode</button>
               <button class="secondary-btn" id="leaderboardBtn">Leaderboard</button>
               <button class="secondary-btn" id="howBtn">How to Play</button>
             </div>
           </div>
-          <div class="tower-card leaderboard-explanation-card" aria-label="Leaderboard title explanation">
-            <section class="last-week-master-card" aria-label="Last week's Little Tower Master">
-              <p class="eyebrow">Previous Weekly Champion</p>
-              <strong id="lastWeekLittleMasterName">No previous weekly champion yet.</strong>
-              <span id="lastWeekLittleMasterMeta">Resets every Sunday at 8:00 PM Philippine Time</span>
-            </section>
 
-            <section class="monthly-master-card" aria-label="Monthly Tower Champion">
-              <p class="eyebrow">Previous Monthly Champion</p>
-              <strong id="monthlyTowerChampionName">No monthly champion yet.</strong>
-              <span id="monthlyTowerChampionMeta">Top 1 player from the previous completed month</span>
-            </section>
+          <div class="tower-card homepage-race-card" aria-label="Champion highlights and top contenders">
+            <section class="main-champion-highlights" aria-label="Main Champion Highlights">
+              <div class="section-mini-head">
+                <p class="eyebrow">Champion Highlights</p>
+                <h2>Main Title Holders</h2>
+              </div>
 
-            <div class="leaderboard-title-section">
-              <p class="eyebrow">Leaderboard Titles</p>
-              <h2>What do the titles mean?</h2>
-              <div class="title-explanation-list">
-                <article class="title-explanation-item">
+              <div class="champion-grid homepage-champion-grid">
+                <div class="champion-card tower-master-card">
                   <span class="champion-crown">♛</span>
                   <div>
-                    <h3>Tower Master</h3>
-                    <p>The Tower Master is the <strong>Overall Top 1 player</strong> in the All-Time Leaderboard.</p>
+                    <p class="champion-title">Grand Tower Master</p>
+                    <strong id="grandTowerMasterName">No champion yet</strong>
+                    <span id="grandTowerMasterMeta">All-Time Top 1 of the Grand Mastery Tower</span>
                   </div>
-                </article>
-                <article class="title-explanation-item">
-                  <span class="champion-crown">♜</span>
+                </div>
+
+                <div class="champion-card little-master-card">
+                  <span class="champion-crown">🏁</span>
                   <div>
-                    <h3>Little Tower Master</h3>
-                    <p>The Little Tower Master is the <strong>Weekly Top 1 player</strong> in the Weekly Leaderboard.</p>
+                    <p class="champion-title">Weekly Grand Champion</p>
+                    <strong id="weeklyGrandChampionName">No weekly champion yet</strong>
+                    <span id="weeklyGrandChampionMeta">Winner from the previous completed week</span>
                   </div>
+                </div>
+
+                <div class="champion-card monthly-master-card">
+                  <span class="champion-crown">👑</span>
+                  <div>
+                    <p class="champion-title">Monthly Grand Champion</p>
+                    <strong id="monthlyGrandChampionName">No monthly champion yet</strong>
+                    <span id="monthlyGrandChampionMeta">Winner from the previous completed month</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="top-contenders-section compact-contenders" aria-label="Top Contenders">
+              <div class="section-mini-head">
+                <p class="eyebrow">Top Contenders</p>
+                <h2>Live Top Contender</h2>
+              </div>
+
+              <div class="contenders-grid compact-contenders-grid">
+                <article class="contender-card">
+                  <h3>Weekly Crown Race: Top Contender</h3>
+                  <ol id="weeklyTopContenders" class="contender-list">
+                    <li>No current weekly contenders yet.</li>
+                  </ol>
+                </article>
+
+                <article class="contender-card">
+                  <h3>Monthly Crown Race: Top Contender</h3>
+                  <ol id="monthlyTopContenders" class="contender-list">
+                    <li>No current monthly contenders yet.</li>
+                  </ol>
                 </article>
               </div>
-            </div>
+            </section>
 
             <p class="developer-credit">Developed by Christian J. Angangan</p>
           </div>
@@ -99,6 +134,7 @@
         <div class="panel narrow">
           <p class="eyebrow">Player Entry</p>
           <h2>Enter your details</h2>
+          <p id="selectedTowerLabel" class="tower-selected-label">Selected Tower: Grand Mastery Tower • 10 Floors • 120 Points</p>
           <label>Student Name
             <input id="playerName" type="text" placeholder="e.g., Juan Dela Cruz" autocomplete="name" />
           </label>
@@ -113,6 +149,116 @@
             <button class="secondary-btn" data-go="homeScreen">Back</button>
           </div>
           <p id="entryMessage" class="message"></p>
+        </div>
+      </section>
+
+      <section id="practiceSetupScreen" class="screen">
+        <div class="panel wide practice-setup-panel">
+          <p class="eyebrow">Practice Mode</p>
+          <h2>Choose a Term and Week</h2>
+          <p class="muted">Practice Mode is for review only. It does not use hearts, does not submit scores, and does not affect the leaderboard.</p>
+
+          <div class="practice-picker-grid">
+            <label>Term
+              <select id="practiceTermSelect">
+                <option value="firstTerm">First Term</option>
+                <option value="secondTerm">Second Term</option>
+                <option value="thirdTerm">Third Term</option>
+              </select>
+            </label>
+
+            <label>Week
+              <select id="practiceWeekSelect">
+                <option value="1">Week 1</option>
+                <option value="2">Week 2</option>
+                <option value="3">Week 3</option>
+                <option value="4">Week 4</option>
+                <option value="5">Week 5</option>
+                <option value="6">Week 6</option>
+                <option value="7">Week 7</option>
+                <option value="8">Week 8</option>
+                <option value="9">Week 9</option>
+                <option value="10">Week 10</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="practice-topic-card">
+            <p class="eyebrow" id="practiceWeekLabel">First Term - Week 1</p>
+            <h3 id="practiceTopicPreview">Law of Sines and solving oblique triangles</h3>
+          </div>
+
+          <div class="button-row">
+            <button class="primary-btn" id="startPracticeBtn">Start Practice</button>
+            <button class="secondary-btn" data-go="homeScreen">Back to Home</button>
+          </div>
+          <p id="practiceSetupMessage" class="message"></p>
+        </div>
+      </section>
+
+      <section id="practiceScreen" class="screen">
+        <div class="game-grid clean-game-grid">
+          <section class="question-panel focused-question-panel practice-question-panel">
+            <div class="question-head clean-question-head">
+              <p id="practiceTopicLabel" class="eyebrow">Practice Mode</p>
+            </div>
+
+            <div class="game-progress-strip practice-progress-strip" aria-label="Practice progress">
+              <div class="floor-sublevel-label">
+                <span>Practice Progress</span>
+                <strong id="practiceProgressLabel">1/10</strong>
+              </div>
+              <div class="floor-sublevel-label">
+                <span>Practice Score</span>
+                <strong id="practiceScoreLabel">0/10</strong>
+              </div>
+            </div>
+
+            <h2 id="practiceQuestionText">Practice question will appear here.</h2>
+            <div id="practiceChoicesBox" class="choices"></div>
+
+            <div id="practiceFeedbackBox" class="practice-feedback-box" aria-live="polite"></div>
+
+            <div class="game-action-buttons">
+              <button class="primary-btn" id="practiceNextBtn" disabled>Next Question</button>
+              <button class="secondary-btn" data-go="practiceSetupScreen">Choose Another Week</button>
+              <button class="secondary-btn" data-go="homeScreen">Back to Home</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="practiceResultScreen" class="screen">
+        <div class="panel wide">
+          <p class="eyebrow success">Practice Result</p>
+          <h2 id="practiceResultTitle">Practice Complete</h2>
+          <p id="practiceResultMessage" class="muted">Great effort. Review your missed questions and try again.</p>
+
+          <div class="result-grid">
+            <div><span>Selected Term</span><strong id="practiceResultTerm">First Term</strong></div>
+            <div><span>Selected Week</span><strong id="practiceResultWeek">Week 1</strong></div>
+            <div><span>Practice Score</span><strong id="practiceResultScore">0/10</strong></div>
+            <div><span>Wrong Answers</span><strong id="practiceResultWrong">0</strong></div>
+          </div>
+
+          <div class="practice-topic-card">
+            <p class="eyebrow">Week Topic</p>
+            <h3 id="practiceResultTopic">Grade 10 Mathematics</h3>
+          </div>
+
+          <section class="practice-review-section">
+            <div class="section-mini-head">
+              <p class="eyebrow">Missed Questions Review</p>
+              <h2>Review and Recover</h2>
+            </div>
+            <div id="practiceReviewList" class="practice-review-list"></div>
+          </section>
+
+          <div class="button-row center">
+            <button class="primary-btn" id="practiceAgainBtn">Practice Again</button>
+            <button class="secondary-btn" data-go="practiceSetupScreen">Choose Another Week</button>
+            <button class="secondary-btn" data-go="homeScreen">Back to Home</button>
+          </div>
         </div>
       </section>
 
@@ -135,10 +281,16 @@
                 </div>
                 <div id="sublevelDots" class="sublevel-dots"></div>
               </div>
+              <div class="hearts-wrap" aria-label="Hearts remaining">
+                <span>Hearts</span>
+                <strong id="heartsLabel">❤️❤️❤️</strong>
+                <small id="heartsHelpText">3/3 hearts left on this floor</small>
+              </div>
             </div>
 
             <h2 id="questionText">Question will appear here.</h2>
             <div id="choicesBox" class="choices"></div>
+            <p id="mistakeFeedback" class="message mistake-feedback" aria-live="polite"></p>
 
             <div class="game-action-buttons">
               <button class="submit-btn" id="submitProgressBtn">Submit Progress</button>
@@ -152,11 +304,11 @@
       <section id="gameOverScreen" class="screen">
         <div class="panel">
           <p class="eyebrow danger">Game Over</p>
-          <h2>One mistake sends you back to the beginning on your next run.</h2>
+          <h2>You lost all 3 hearts on this floor. Recover and try again!</h2>
           <div class="result-grid">
             <div><span>Floor Reached</span><strong id="overFloor">1</strong></div>
             <div><span>Sublevel Reached</span><strong id="overSublevel">0</strong></div>
-            <div><span>Score</span><strong id="overScore">0/120</strong></div>
+            <div><span>Score</span><strong id="overScore">0/360</strong></div>
             <div><span>Time Used</span><strong id="overTime">00:00</strong></div>
           </div>
           <div class="explanation-box">
@@ -180,7 +332,7 @@
           <div class="result-grid">
             <div><span>Floor Reached</span><strong id="quitFloor">1</strong></div>
             <div><span>Sublevel Reached</span><strong id="quitSublevel">0</strong></div>
-            <div><span>Score</span><strong id="quitScore">0/120</strong></div>
+            <div><span>Score</span><strong id="quitScore">0/360</strong></div>
             <div><span>Time Used</span><strong id="quitTime">00:00</strong></div>
           </div>
           <div class="button-row">
@@ -196,9 +348,9 @@
         <div class="panel celebration">
           <p class="eyebrow success">Tower Completed</p>
           <h2>Congratulations! You completed the Mastery Tower.</h2>
-          <p>You achieved a perfect 120-question streak.</p>
+          <p id="completeSummary">You completed the tower. Great climb!</p>
           <div class="result-grid">
-            <div><span>Final Score</span><strong>120/120</strong></div>
+            <div><span>Final Score</span><strong id="completeScore">0/360</strong></div>
             <div><span>Total Time</span><strong id="completeTime">00:00</strong></div>
           </div>
           <div id="badgeBox" class="badges"></div>
@@ -219,16 +371,94 @@
             </div>
             <button class="secondary-btn" data-go="homeScreen">Home</button>
           </div>
-          <p class="muted">Ranking: Highest Floor → Highest Sublevel → Fastest Time. Each leaderboard shows only the Top 10. Weekly rankings reset every Sunday at 8:00 PM Philippine Time.</p>
+          <p class="muted">Ranking: Highest Floor → Highest Sublevel → Highest Score → Fastest Time. Each leaderboard shows only the Top 10. Weekly rankings reset every Sunday at 8:00 PM Philippine Time.</p>
+
+          <section class="leaderboard-full-hall" aria-label="Full Hall of Champions">
+            <div class="section-mini-head">
+              <p class="eyebrow">Full Hall of Champions</p>
+              <h2>Official Title Holders</h2>
+              <p class="muted">Official title holders across the Grand Mastery Tower and Term Towers.</p>
+            </div>
+
+            <div class="champion-grid champion-grid-expanded">
+              <div class="champion-card tower-master-card">
+                <span class="champion-crown">♛</span>
+                <div>
+                  <p class="champion-title">Grand Tower Master</p>
+                  <strong id="lbGrandTowerMasterName">No champion yet</strong>
+                  <span id="lbGrandTowerMasterMeta">All-Time Top 1 of the Grand Mastery Tower</span>
+                </div>
+              </div>
+
+              <div class="champion-card little-master-card">
+                <span class="champion-crown">🏁</span>
+                <div>
+                  <p class="champion-title">Weekly Grand Champion</p>
+                  <strong id="lbWeeklyGrandChampionName">No weekly champion yet</strong>
+                  <span id="lbWeeklyGrandChampionMeta">Winner from the previous completed week</span>
+                </div>
+              </div>
+
+              <div class="champion-card monthly-master-card">
+                <span class="champion-crown">👑</span>
+                <div>
+                  <p class="champion-title">Monthly Grand Champion</p>
+                  <strong id="lbMonthlyGrandChampionName">No monthly champion yet</strong>
+                  <span id="lbMonthlyGrandChampionMeta">Winner from the previous completed month</span>
+                </div>
+              </div>
+
+              <div class="champion-card term-master-card">
+                <span class="champion-crown">Ⅰ</span>
+                <div>
+                  <p class="champion-title">First Term Tower Master</p>
+                  <strong id="term1TowerMasterName">No champion yet</strong>
+                  <span id="term1TowerMasterMeta">All-Time Top 1 of the First Term Trial Tower</span>
+                </div>
+              </div>
+
+              <div class="champion-card term-master-card">
+                <span class="champion-crown">Ⅱ</span>
+                <div>
+                  <p class="champion-title">Second Term Tower Master</p>
+                  <strong id="term2TowerMasterName">No champion yet</strong>
+                  <span id="term2TowerMasterMeta">All-Time Top 1 of the Second Term Challenge Tower</span>
+                </div>
+              </div>
+
+              <div class="champion-card term-master-card">
+                <span class="champion-crown">Ⅲ</span>
+                <div>
+                  <p class="champion-title">Third Term Tower Master</p>
+                  <strong id="term3TowerMasterName">No champion yet</strong>
+                  <span id="term3TowerMasterMeta">All-Time Top 1 of the Third Term Mastery Tower</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+
+
+          <div class="leaderboard-tower-filter">
+            <label>Choose Leaderboard Tower
+              <select id="leaderboardTowerSelect">
+                <option value="bigTower">Grand Mastery Tower</option>
+                <option value="term1Tower">First Term Trial Tower</option>
+                <option value="term2Tower">Second Term Challenge Tower</option>
+                <option value="term3Tower">Third Term Mastery Tower</option>
+              </select>
+            </label>
+            <p id="leaderboardTowerContext" class="muted">Showing records for Grand Mastery Tower only.</p>
+          </div>
 
           <div class="leaderboard-grid">
             <article class="leaderboard-card">
               <div class="leaderboard-title-row">
                 <div>
                   <p class="eyebrow">Current Week</p>
-                  <h3>Weekly Leaderboard</h3>
+                  <h3 id="weeklyLeaderboardTitle">Grand Mastery Tower Weekly Leaderboard</h3>
                 </div>
-                <span class="master-chip">Top 1: Little Tower Master</span>
+                <span class="master-chip">Top 1: Current Weekly Leader</span>
               </div>
               <div class="table-wrap">
                 <table>
@@ -254,9 +484,9 @@
               <div class="leaderboard-title-row">
                 <div>
                   <p class="eyebrow">Overall Records</p>
-                  <h3>All-Time Leaderboard</h3>
+                  <h3 id="allTimeLeaderboardTitle">Grand Mastery Tower All-Time Leaderboard</h3>
                 </div>
-                <span class="master-chip">Top 1: Tower Master</span>
+                <span class="master-chip">Top 1: Selected Tower Master</span>
               </div>
               <div class="table-wrap">
                 <table>
@@ -288,20 +518,24 @@
           <h2>How to Play</h2>
           <div class="rules-grid">
             <article>
-              <h3>Perfect Run</h3>
-              <p>Answer correctly to move up one sublevel. One wrong answer ends the run and resets the next attempt to Floor 1 — Sublevel 0.</p>
+              <h3>3 Hearts Per Floor</h3>
+              <p>Each floor starts with 3 hearts. A correct answer gives +1 score. A wrong answer removes 1 heart but the run continues. Game Over happens only when all 3 hearts are lost on the same floor.</p>
             </article>
             <article>
-              <h3>Difficulty Floors</h3>
-              <p>Each floor has one fixed difficulty level, starting from Very Easy and becoming harder until Mastery Level. Each 12-question floor attempt uses 12 different Grade 10 Mathematics topics: 3 Algebra, 3 Geometry, 3 Probability, and 3 Statistics.</p>
+              <h3>Four Towers</h3>
+              <p>The Grand Mastery Tower has 30 floors representing the 30 weeks of the Grade 10 Mathematics BOW. Each Term Tower has 10 floors representing the 10 weeks of that term. Choose a tower on the homepage before entering your details.</p>
             </article>
             <article>
               <h3>Quit Button</h3>
               <p>Use Quit Run to voluntarily stop your attempt. It does not count as a wrong answer.</p>
             </article>
             <article>
+              <h3>Practice Mode</h3>
+              <p>Choose any term and week, answer 10 review questions, see feedback and explanations, then review missed items. Practice Mode does not affect Firebase or the leaderboard.</p>
+            </article>
+            <article>
               <h3>Leaderboard</h3>
-              <p>Students are ranked by floor reached, sublevel reached, then fastest time.</p>
+              <p>Students are ranked by floor reached, sublevel reached, highest score, then fastest time. This rewards both progress and accuracy.</p>
             </article>
           </div>
           <button class="secondary-btn" data-go="homeScreen">Back to Home</button>
