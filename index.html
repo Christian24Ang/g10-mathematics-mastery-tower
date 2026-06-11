@@ -8,7 +8,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 </head>
-  <link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/png" href="favicon.png">
 <body>
   <div class="app-shell">
     <header class="topbar">
@@ -17,9 +17,9 @@
         <h1>Grade 10 Mathematics Mastery Tower</h1>
       </div>
       <div class="topbar-stats">
-        <span id="topFloor">Floor 1</span>
-        <span id="topScore">0/120</span>
-        <span id="topTimer">00:00</span>
+        <span id="topTimer" class="time-chip">Time: 00:00</span>
+        <span id="topFloor" class="hidden-run-stat">Floor 1</span>
+        <span id="topScore" class="hidden-run-stat">0/120</span>
       </div>
     </header>
 
@@ -117,34 +117,34 @@
       </section>
 
       <section id="gameScreen" class="screen">
-        <div class="game-grid">
-          <aside class="progress-panel">
-            <p class="eyebrow">Current Run</p>
-            <h2 id="positionLabel">Floor 1 — Sublevel 0</h2>
-            <div class="meter">
-              <div id="scoreBar" class="meter-fill"></div>
+        <div class="game-grid clean-game-grid">
+          <section class="question-panel focused-question-panel">
+            <div class="question-head clean-question-head">
+              <p id="floorTopic" class="eyebrow screen-reader-status"></p>
             </div>
-            <div class="stat-list">
-              <div><span>Score</span><strong id="scoreLabel">0/120</strong></div>
-              <div><span>Time</span><strong id="timerLabel">00:00</strong></div>
-              <div><span>Difficulty</span><strong id="difficultyLabel">Very Easy</strong></div>
-              <div><span>Topic</span><strong id="topicLabel">Grade 10 Mathematics</strong></div>
+
+            <div class="game-progress-strip" aria-label="Floor and sublevel progress">
+              <div class="floor-sublevel-label">
+                <span>Floor Level</span>
+                <strong id="positionLabel">1</strong>
+              </div>
+              <div class="sublevel-progress-wrap compact-sublevel-progress" aria-label="Sublevel progress">
+                <div class="sublevel-progress-head">
+                  <span>Sublevel Progress</span>
+                  <strong id="sublevelProgressLabel">0/12</strong>
+                </div>
+                <div id="sublevelDots" class="sublevel-dots"></div>
+              </div>
             </div>
-            <div class="button-stack">
+
+            <h2 id="questionText">Question will appear here.</h2>
+            <div id="choicesBox" class="choices"></div>
+
+            <div class="game-action-buttons">
               <button class="submit-btn" id="submitProgressBtn">Submit Progress</button>
               <button class="danger-btn" id="quitBtn">Quit Run</button>
             </div>
             <p id="submitMessage" class="message"></p>
-            <div class="mini-tower" id="miniTower"></div>
-          </aside>
-
-          <section class="question-panel">
-            <div class="question-head">
-              <p id="floorTopic" class="eyebrow">Floor 1</p>
-              <span id="difficultyChip" class="chip">Very Easy</span>
-            </div>
-            <h2 id="questionText">Question will appear here.</h2>
-            <div id="choicesBox" class="choices"></div>
           </section>
         </div>
       </section>
