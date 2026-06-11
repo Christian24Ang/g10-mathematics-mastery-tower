@@ -761,6 +761,8 @@ async function submitProgress(messageElementId) {
   }
 
   const progress = buildProgressRecord();
+  const studentKey = makeStudentDocId(progress.name, progress.section, progress.school);
+  progress.studentKey = studentKey;
 
   if (state.submittedKeys.has(progress.progressKey)) {
     msg.textContent = "This exact progress has already been submitted.";
@@ -773,12 +775,61 @@ async function submitProgress(messageElementId) {
   }
 
   try {
-    // Firestore automatically creates the "leaderboard" collection
-    // the first time a student submits progress.
-    await db.collection(LEADERBOARD_COLLECTION).add({
-      ...progress,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    const studentRef = db.collection(LEADERBOARD_COLLECTION).doc(studentKey);
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+
+    await db.runTransaction(async (transaction) => {
+      const existingDoc = await transaction.get(studentRef);
+      const existingData = existingDoc.exists ? existingDoc.data() : null;
+      const existingBest = existingData ? normalizeLeaderboardRecord(existingData) : null;
+      const submittedRecord = {
+        ...progress,
+        submittedAt: now,
+        updatedAt: now,
+        timestamp: now,
+        latestFloor: progress.currentFloor,
+        latestSublevel: progress.currentSublevel,
+        latestScore: progress.totalScore,
+        latestTimeSeconds: progress.timeUsedSeconds,
+        latestTimeFormatted: progress.timeUsedFormatted
+      };
+
+      let bestRecord = {
+        bestFloor: progress.currentFloor,
+        bestSublevel: progress.currentSublevel,
+        bestScore: progress.totalScore,
+        bestTimeSeconds: progress.timeUsedSeconds,
+        bestTimeFormatted: progress.timeUsedFormatted,
+        bestStatus: progress.status,
+        bestWeekId: progress.weekId,
+        bestMonthId: progress.monthId,
+        bestRunId: progress.runId,
+        bestProgressKey: progress.progressKey
+      };
+
+      if (existingBest && !isNewSubmissionBetter(progress, existingBest)) {
+        bestRecord = {
+          bestFloor: existingBest.bestFloor,
+          bestSublevel: existingBest.bestSublevel,
+          bestScore: existingBest.bestScore,
+          bestTimeSeconds: existingBest.bestTimeSeconds,
+          bestTimeFormatted: existingBest.bestTimeFormatted,
+          bestStatus: existingData.bestStatus || existingBest.status || existingData.status || "Submitted",
+          bestWeekId: existingData.bestWeekId || existingData.weekId || "",
+          bestMonthId: existingData.bestMonthId || existingData.monthId || "",
+          bestRunId: existingData.bestRunId || existingData.runId || "",
+          bestProgressKey: existingData.bestProgressKey || existingData.progressKey || ""
+        };
+      }
+
+      const finalRecord = {
+        ...submittedRecord,
+        ...bestRecord,
+        createdAt: existingData?.createdAt || now,
+        submissionCount: (Number(existingData?.submissionCount || 0) + 1)
+      };
+
+      transaction.set(studentRef, finalRecord);
     });
 
     state.submittedKeys.add(progress.progressKey);
@@ -787,8 +838,18 @@ async function submitProgress(messageElementId) {
     disableSubmitButtonForCurrentScreen();
   } catch (error) {
     console.error("Submission failed:", error);
-    msg.textContent = "Submission failed. Please check your internet connection or tell your teacher.";
+    msg.textContent = "Submission failed. Please check your internet connection, Firestore rules, or tell your teacher.";
   }
+}
+
+function isNewSubmissionBetter(progress, existingBest) {
+  const newRecord = {
+    bestFloor: Number(progress.currentFloor || progress.floor || 1),
+    bestSublevel: Number(progress.currentSublevel || progress.sublevel || 0),
+    bestTimeSeconds: Number(progress.timeUsedSeconds || progress.timeUsed || 0)
+  };
+
+  return isBetterRecord(newRecord, existingBest);
 }
 
 function disableSubmitButtonForCurrentScreen() {
@@ -814,6 +875,7 @@ function buildProgressRecord() {
     name: cleanName,
     section: cleanSection,
     school: cleanSchool,
+    studentKey: makeStudentDocId(cleanName, cleanSection, cleanSchool),
 
     // Progress fields used by the Grade 10 Mastery Tower
     currentFloor: reached.floor,
@@ -935,7 +997,7 @@ async function getPreviousMonthLeaderboardRecords() {
     if (!record.name || !record.section) return;
 
     const submittedAt = getRecordDate(rawRecord.timestamp || rawRecord.createdAt);
-    const matchesMonthId = rawRecord.monthId === previousMonthId;
+    const matchesMonthId = rawRecord.monthId === previousMonthId || rawRecord.bestMonthId === previousMonthId;
     const matchesDateRange = submittedAt && isDateInPhtMonth(submittedAt, previousMonth.year, previousMonth.month);
 
     if (!matchesMonthId && !matchesDateRange) return;
@@ -952,16 +1014,16 @@ async function getPreviousMonthLeaderboardRecords() {
 }
 
 async function getLeaderboardRecordsByWeekId(weekId) {
-  const snapshot = await db
-    .collection(LEADERBOARD_COLLECTION)
-    .where("weekId", "==", weekId)
-    .get();
-
+  const snapshot = await db.collection(LEADERBOARD_COLLECTION).get();
   const bestByStudent = new Map();
 
   snapshot.forEach((doc) => {
-    const record = normalizeLeaderboardRecord(doc.data());
+    const rawRecord = doc.data();
+    const record = normalizeLeaderboardRecord(rawRecord);
     if (!record.name || !record.section) return;
+
+    const matchesWeek = rawRecord.weekId === weekId || rawRecord.bestWeekId === weekId;
+    if (!matchesWeek) return;
 
     const key = makeStudentDocId(record.name, record.section, record.school);
     const existing = bestByStudent.get(key);
@@ -979,14 +1041,17 @@ function normalizeLeaderboardRecord(record) {
     name: record.name,
     section: record.section,
     school: record.school || record.gradeLevel || "",
+    studentKey: record.studentKey || makeStudentDocId(record.name, record.section, record.school || record.gradeLevel || ""),
     bestFloor: Number(record.bestFloor ?? record.currentFloor ?? record.floor ?? 1),
     bestSublevel: Number(record.bestSublevel ?? record.currentSublevel ?? record.sublevel ?? 0),
     bestScore: Number(record.bestScore ?? record.totalScore ?? record.score ?? 0),
     bestTimeSeconds: Number(record.bestTimeSeconds ?? record.timeUsedSeconds ?? record.timeUsed ?? 0),
-    bestTimeFormatted: record.bestTimeFormatted || record.timeUsedFormatted || formatTime(record.timeUsedSeconds ?? record.timeUsed ?? 0),
-    status: record.status || "Submitted",
+    bestTimeFormatted: record.bestTimeFormatted || record.timeUsedFormatted || formatTime(record.bestTimeSeconds ?? record.timeUsedSeconds ?? record.timeUsed ?? 0),
+    status: record.bestStatus || record.status || "Submitted",
     weekId: record.weekId,
-    monthId: record.monthId
+    monthId: record.monthId,
+    bestWeekId: record.bestWeekId || record.weekId,
+    bestMonthId: record.bestMonthId || record.monthId
   };
 }
 
@@ -1212,7 +1277,11 @@ function createRunId() {
 }
 
 function makeStudentDocId(name, section, school = "") {
-  return `${name}_${section}_${school}`.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+  return `${name}_${section}_${school}`
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "") || "unknown_student";
 }
 
 function normalizeText(value) {
